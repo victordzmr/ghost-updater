@@ -1,0 +1,38 @@
+#!/bin/bash
+
+##
+# Ghost updater.
+#
+# Performs a secure update of an existing Ghost installation to the latest version.
+#
+# @author Víctor Díaz <victor@axiomer.com>
+# @website https://victordiaz.me
+# @copyright 2016 Víctor Díaz
+# @license The MIT License (MIT) https://opensource.org/licenses/MIT
+# @version 1.0.0
+##
+
+DIRNAME="${1:-./ghost}"
+ZIP='/tmp/ghost.zip'
+DIRTMP='/tmp/ghost'
+
+curl -sL 'https://ghost.org/zip/ghost-latest.zip' -o $ZIP
+unzip -q $ZIP -d $DIRTMP
+
+rm -rf "${DIRNAME}/core" "${DIRNAME}/content/themes/casper"
+rm -f "${DIRNAME}/index.js" "${DIRNAME}/config.example.js" "${DIRNAME}"/*.md "${DIRNAME}"/*.json
+
+mv "${DIRTMP}/core" $DIRNAME
+mv "${DIRTMP}/content/themes/casper" "${DIRNAME}/content/themes/casper"
+mv "${DIRTMP}/index.js" $DIRNAME
+mv "${DIRTMP}/config.example.js" $DIRNAME
+mv "${DIRTMP}"/*.md $DIRNAME
+mv "${DIRTMP}"/*.json $DIRNAME
+
+rm -f $ZIP
+rm -rf $DIRTMP
+
+cd $DIRNAME
+npm install --production
+
+echo "Ghost has been updated. Do not forget to restart it."
